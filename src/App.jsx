@@ -10,6 +10,7 @@ import Packages from './components/Packages'
 import FAQ from './components/FAQ'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
+import CateringHarianPage from './components/CateringHarianPage'
 import CateringBoxPage from './components/CateringBoxPage'
 import PrasmananPage from './components/PrasmananPage'
 
@@ -18,7 +19,7 @@ const SPLASH_DURATION = 1600 // ms shown before landing page appears
 export default function App() {
   const [showSplash, setShowSplash] = useState(true)
   const [heroReady, setHeroReady] = useState(false)
-  const [page, setPage] = useState('home') // 'home' | 'catering-box' | 'prasmanan'
+  const [page, setPage] = useState('home') // 'home' | 'harian' | 'catering-box' | 'prasmanan'
   const heroAboutRef = useRef(null)
   const heroSpaceRef = useRef(null)
   const aboutSpaceRef = useRef(null)
@@ -33,6 +34,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [page])
 
+  const handleNavigateToHarian = () => setPage('harian')
   const handleNavigateToCateringBox = () => setPage('catering-box')
   const handleNavigateToPrasmanan = () => setPage('prasmanan')
   const handleNavigateHome = () => setPage('home')
@@ -40,7 +42,17 @@ export default function App() {
   return (
     <>
       <AnimatePresence mode="wait">
-        {page === 'catering-box' ? (
+        {page === 'harian' ? (
+          <motion.div
+            key="harian-page"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <CateringHarianPage onBack={handleNavigateHome} />
+          </motion.div>
+        ) : page === 'catering-box' ? (
           <motion.div
             key="catering-box-page"
             initial={{ opacity: 0, y: 20 }}
@@ -93,6 +105,7 @@ export default function App() {
 
             <WhyUs />
             <Packages
+              onNavigateHarian={handleNavigateToHarian}
               onNavigateCateringBox={handleNavigateToCateringBox}
               onNavigatePrasmanan={handleNavigateToPrasmanan}
             />

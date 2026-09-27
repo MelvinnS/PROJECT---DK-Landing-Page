@@ -40,7 +40,7 @@ const packages = [
   },
 ]
 
-export default function Packages({ onNavigateCateringBox, onNavigatePrasmanan }) {
+export default function Packages({ onNavigateHarian, onNavigateCateringBox, onNavigatePrasmanan }) {
   const scrollRef = useRef(null)
 
   const handleScroll = (direction) => {
@@ -82,13 +82,16 @@ export default function Packages({ onNavigateCateringBox, onNavigatePrasmanan })
           {/* Cards container */}
           <div className="packages-cards-scroll" ref={scrollRef}>
             {packages.map((pkg, i) => {
-              const isClickable = pkg.id === 'box' || pkg.id === 'prasmanan'
-              const handleClick = pkg.id === 'box'
+              const handleClick = pkg.id === 'harian'
+                ? onNavigateHarian
+                : pkg.id === 'box'
                 ? onNavigateCateringBox
                 : pkg.id === 'prasmanan'
                 ? onNavigatePrasmanan
                 : undefined
-              const cardTitle = pkg.id === 'box'
+              const cardTitle = pkg.id === 'harian'
+                ? 'Klik untuk lihat detail langganan Catering Harian'
+                : pkg.id === 'box'
                 ? 'Klik untuk lihat paket lengkap Catering Box'
                 : pkg.id === 'prasmanan'
                 ? 'Klik untuk lihat katalog pilihan menu Prasmanan'
@@ -97,7 +100,7 @@ export default function Packages({ onNavigateCateringBox, onNavigatePrasmanan })
               return (
                 <motion.article
                   key={pkg.id}
-                  className={`oatside-pkg-card ${isClickable ? 'is-clickable' : ''}`}
+                  className="oatside-pkg-card is-clickable"
                   style={{ backgroundColor: pkg.bg }}
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -113,6 +116,9 @@ export default function Packages({ onNavigateCateringBox, onNavigatePrasmanan })
                       <span>{pkg.titleLine2}</span>
                     </h3>
                     {/* CTA pill on clickable cards */}
+                    {pkg.id === 'harian' && (
+                      <span className="card-cta-pill">Lihat Langganan →</span>
+                    )}
                     {pkg.id === 'box' && (
                       <span className="card-cta-pill">Lihat Paket →</span>
                     )}
@@ -157,6 +163,9 @@ export default function Packages({ onNavigateCateringBox, onNavigatePrasmanan })
 
         {/* Explore More CTA Buttons */}
         <div className="packages-cta-wrap">
+          <button className="packages-explore-btn btn-harian" onClick={onNavigateHarian}>
+            Langganan Catering Harian →
+          </button>
           <button className="packages-explore-btn" onClick={onNavigateCateringBox}>
             Lihat Paket Catering Box →
           </button>
@@ -443,6 +452,15 @@ export default function Packages({ onNavigateCateringBox, onNavigatePrasmanan })
           transform: translate(-1.5px, -1.5px);
           box-shadow: 4.5px 5px 0 #1c1a17;
           background: #faf6ee;
+        }
+
+        .packages-explore-btn.btn-harian {
+          background: #f2b724;
+          color: #1c1a17;
+        }
+
+        .packages-explore-btn.btn-harian:hover {
+          background: #e5aa1b;
         }
 
         .packages-explore-btn.btn-pras {
