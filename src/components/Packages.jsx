@@ -40,7 +40,7 @@ const packages = [
   },
 ]
 
-export default function Packages({ onNavigateCateringBox }) {
+export default function Packages({ onNavigateCateringBox, onNavigatePrasmanan }) {
   const scrollRef = useRef(null)
 
   const handleScroll = (direction) => {
@@ -81,36 +81,52 @@ export default function Packages({ onNavigateCateringBox }) {
 
           {/* Cards container */}
           <div className="packages-cards-scroll" ref={scrollRef}>
-            {packages.map((pkg, i) => (
-              <motion.article
-                key={pkg.id}
-                className={`oatside-pkg-card ${pkg.id === 'box' ? 'is-clickable' : ''}`}
-                style={{ backgroundColor: pkg.bg }}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
-                onClick={pkg.id === 'box' ? onNavigateCateringBox : undefined}
-                title={pkg.id === 'box' ? 'Klik untuk lihat paket lengkap Catering Box' : undefined}
-              >
-                {/* Header text on top-left of card */}
-                <div className="card-top">
-                  <h3 className="card-title" style={{ color: pkg.textColor }}>
-                    <span>{pkg.titleLine1}</span>
-                    <span>{pkg.titleLine2}</span>
-                  </h3>
-                  {/* "Lihat Paket" pill on catering box card */}
-                  {pkg.id === 'box' && (
-                    <span className="card-cta-pill">Lihat Paket →</span>
-                  )}
-                </div>
+            {packages.map((pkg, i) => {
+              const isClickable = pkg.id === 'box' || pkg.id === 'prasmanan'
+              const handleClick = pkg.id === 'box'
+                ? onNavigateCateringBox
+                : pkg.id === 'prasmanan'
+                ? onNavigatePrasmanan
+                : undefined
+              const cardTitle = pkg.id === 'box'
+                ? 'Klik untuk lihat paket lengkap Catering Box'
+                : pkg.id === 'prasmanan'
+                ? 'Klik untuk lihat katalog pilihan menu Prasmanan'
+                : undefined
 
-                {/* Creative Organic Cutout with Image */}
-                <div className={`card-cutout-wrap ${pkg.cutoutType}`}>
-                  <div className="card-cutout-inner">
-                    <img src={pkg.image} alt={`${pkg.titleLine1} ${pkg.titleLine2}`} loading="lazy" />
+              return (
+                <motion.article
+                  key={pkg.id}
+                  className={`oatside-pkg-card ${isClickable ? 'is-clickable' : ''}`}
+                  style={{ backgroundColor: pkg.bg }}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+                  onClick={handleClick}
+                  title={cardTitle}
+                >
+                  {/* Header text on top-left of card */}
+                  <div className="card-top">
+                    <h3 className="card-title" style={{ color: pkg.textColor }}>
+                      <span>{pkg.titleLine1}</span>
+                      <span>{pkg.titleLine2}</span>
+                    </h3>
+                    {/* CTA pill on clickable cards */}
+                    {pkg.id === 'box' && (
+                      <span className="card-cta-pill">Lihat Paket →</span>
+                    )}
+                    {pkg.id === 'prasmanan' && (
+                      <span className="card-cta-pill">Lihat Katalog →</span>
+                    )}
                   </div>
-                </div>
+
+                  {/* Creative Organic Cutout with Image */}
+                  <div className={`card-cutout-wrap ${pkg.cutoutType}`}>
+                    <div className="card-cutout-inner">
+                      <img src={pkg.image} alt={`${pkg.titleLine1} ${pkg.titleLine2}`} loading="lazy" />
+                    </div>
+                  </div>
 
                 {/* Subtitle / Description on bottom-left of card */}
                 <div className="card-bottom">
@@ -122,8 +138,9 @@ export default function Packages({ onNavigateCateringBox }) {
                   </span>
                 </div>
               </motion.article>
-            ))}
-          </div>
+            )
+          })}
+        </div>
 
           {/* Navigation Arrow Right */}
           <button
@@ -138,10 +155,13 @@ export default function Packages({ onNavigateCateringBox }) {
           </button>
         </div>
 
-        {/* Explore More CTA Button */}
+        {/* Explore More CTA Buttons */}
         <div className="packages-cta-wrap">
           <button className="packages-explore-btn" onClick={onNavigateCateringBox}>
-            Lihat Semua Paket Catering Box →
+            Lihat Paket Catering Box →
+          </button>
+          <button className="packages-explore-btn btn-pras" onClick={onNavigatePrasmanan}>
+            Katalog Menu Prasmanan →
           </button>
         </div>
       </div>
@@ -397,6 +417,8 @@ export default function Packages({ onNavigateCateringBox }) {
         .packages-cta-wrap {
           display: flex;
           justify-content: center;
+          gap: 14px;
+          flex-wrap: wrap;
           margin-top: 48px;
         }
 
@@ -404,7 +426,7 @@ export default function Packages({ onNavigateCateringBox }) {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 12px 32px;
+          padding: 12px 28px;
           border-radius: 9999px;
           background: #ffffff;
           color: #1c1a17;
@@ -413,6 +435,7 @@ export default function Packages({ onNavigateCateringBox }) {
           font-weight: 700;
           border: 2px solid #1c1a17;
           box-shadow: 3px 3.5px 0 #1c1a17;
+          cursor: pointer;
           transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
 
@@ -420,6 +443,15 @@ export default function Packages({ onNavigateCateringBox }) {
           transform: translate(-1.5px, -1.5px);
           box-shadow: 4.5px 5px 0 #1c1a17;
           background: #faf6ee;
+        }
+
+        .packages-explore-btn.btn-pras {
+          background: #8ec637;
+          color: #143d1a;
+        }
+
+        .packages-explore-btn.btn-pras:hover {
+          background: #82b930;
         }
 
         @media (max-width: 960px) {

@@ -11,13 +11,14 @@ import FAQ from './components/FAQ'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
 import CateringBoxPage from './components/CateringBoxPage'
+import PrasmananPage from './components/PrasmananPage'
 
 const SPLASH_DURATION = 1600 // ms shown before landing page appears
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true)
   const [heroReady, setHeroReady] = useState(false)
-  const [page, setPage] = useState('home') // 'home' | 'catering-box'
+  const [page, setPage] = useState('home') // 'home' | 'catering-box' | 'prasmanan'
   const heroAboutRef = useRef(null)
   const heroSpaceRef = useRef(null)
   const aboutSpaceRef = useRef(null)
@@ -33,6 +34,7 @@ export default function App() {
   }, [page])
 
   const handleNavigateToCateringBox = () => setPage('catering-box')
+  const handleNavigateToPrasmanan = () => setPage('prasmanan')
   const handleNavigateHome = () => setPage('home')
 
   return (
@@ -47,6 +49,16 @@ export default function App() {
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           >
             <CateringBoxPage onBack={handleNavigateHome} />
+          </motion.div>
+        ) : page === 'prasmanan' ? (
+          <motion.div
+            key="prasmanan-page"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <PrasmananPage onBack={handleNavigateHome} />
           </motion.div>
         ) : (
           <motion.div
@@ -80,7 +92,10 @@ export default function App() {
             </div>
 
             <WhyUs />
-            <Packages onNavigateCateringBox={handleNavigateToCateringBox} />
+            <Packages
+              onNavigateCateringBox={handleNavigateToCateringBox}
+              onNavigatePrasmanan={handleNavigateToPrasmanan}
+            />
             <FAQ />
             <Footer />
             <WhatsAppButton />
