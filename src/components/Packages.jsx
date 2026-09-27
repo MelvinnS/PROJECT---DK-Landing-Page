@@ -93,24 +93,35 @@ export default function Packages() {
           display: flex;
           flex-direction: column;
           overflow: hidden;
+          border: 1.8px solid #1c1a17;
+          box-shadow: 3.5px 4px 0 #1c1a17;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .package-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 4.5px 6px 0 #1c1a17;
         }
         .package-body {
           padding-bottom: 20px;
         }
         .package-label {
-          font-size: 12.5px;
-          font-weight: 700;
-          letter-spacing: 0.02em;
-          opacity: 0.65;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          color: #1c1a17;
+          opacity: 0.75;
         }
         .package-body h3 {
           margin-top: 8px;
           font-size: 21px;
+          font-weight: 800;
+          color: #1c1a17;
         }
         .package-body p {
           margin-top: 10px;
           font-size: 14px;
-          color: rgba(28, 26, 23, 0.72);
+          color: rgba(28, 26, 23, 0.78);
         }
         .package-arrow {
           margin-top: 16px;
@@ -118,15 +129,28 @@ export default function Packages() {
           height: 38px;
           border-radius: 50%;
           background: #fff;
+          border: 1.5px solid #1c1a17;
+          box-shadow: 2px 2px 0 #1c1a17;
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 16px;
+          font-weight: 700;
+          color: #1c1a17;
+          transition: transform 0.15s ease, background 0.15s ease;
+        }
+        .package-arrow:hover {
+          background: #1c1a17;
+          color: #fff;
+          transform: scale(1.05);
         }
         .package-image {
           width: 100%;
           aspect-ratio: 16 / 11;
           border-radius: 16px 16px 0 0;
+          border-top: 1.8px solid #1c1a17;
+          border-left: 1.8px solid #1c1a17;
+          border-right: 1.8px solid #1c1a17;
           overflow: hidden;
         }
         .package-image img {

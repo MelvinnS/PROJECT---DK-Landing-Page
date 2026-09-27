@@ -2,25 +2,40 @@ import { useEffect, useLayoutEffect, useState } from 'react'
 import { motion, useMotionValue, useTransform, useScroll, useSpring, animate } from 'framer-motion'
 import { photos } from '../data/photos'
 
-// Fan-out layout while photos sit inside the HERO reserved box.
-// All values are PERCENTAGES of that box's own width/height, so the
-// cluster always fits the box regardless of screen size or text length
-// (this is what fixes photos overlapping the headline/buttons).
-const heroFan = [
-  { xPct: 2, yPct: 34, wPct: 20, rotate: -10, z: 2 },
-  { xPct: 22, yPct: 14, wPct: 21, rotate: -5, z: 3 },
-  { xPct: 41, yPct: 0, wPct: 24, rotate: 0, z: 5 },
-  { xPct: 64, yPct: 16, wPct: 21, rotate: 6, z: 3 },
-  { xPct: 82, yPct: 32, wPct: 19, rotate: 11, z: 2 },
+// Fan-out layout while photos sit inside the HERO reserved box (Desktop)
+const heroFanDesktop = [
+  { xPct: 2, yPct: 28, wPct: 20, rotate: -10, z: 2 },
+  { xPct: 22, yPct: 12, wPct: 21, rotate: -5, z: 3 },
+  { xPct: 41, yPct: 0, wPct: 23, rotate: 0, z: 5 },
+  { xPct: 62, yPct: 12, wPct: 21, rotate: 5, z: 3 },
+  { xPct: 80, yPct: 28, wPct: 20, rotate: 10, z: 2 },
 ]
 
-// Layout once the photos "land" inside the ABOUT collage box (right column).
-const aboutFan = [
-  { xPct: 2, yPct: 6, wPct: 40, rotate: -5, z: 2 },
-  { xPct: 48, yPct: 0, wPct: 34, rotate: 4, z: 4 },
-  { xPct: 8, yPct: 44, wPct: 32, rotate: 6, z: 5 },
-  { xPct: 52, yPct: 38, wPct: 30, rotate: -3, z: 3 },
-  { xPct: 26, yPct: 64, wPct: 34, rotate: -7, z: 4 },
+// Fan-out layout for HERO on Mobile (overlapping cards)
+const heroFanMobile = [
+  { xPct: 1, yPct: 22, wPct: 34, rotate: -12, z: 2 },
+  { xPct: 18, yPct: 10, wPct: 36, rotate: -6, z: 3 },
+  { xPct: 33, yPct: 0, wPct: 38, rotate: 0, z: 5 },
+  { xPct: 49, yPct: 10, wPct: 36, rotate: 6, z: 3 },
+  { xPct: 66, yPct: 22, wPct: 34, rotate: 12, z: 2 },
+]
+
+// Collage layout once photos land inside ABOUT (Desktop)
+const aboutFanDesktop = [
+  { xPct: 2, yPct: 2, wPct: 40, rotate: -4, z: 2 },
+  { xPct: 48, yPct: 4, wPct: 40, rotate: 4, z: 3 },
+  { xPct: 6, yPct: 34, wPct: 37, rotate: 5, z: 4 },
+  { xPct: 50, yPct: 30, wPct: 37, rotate: -3, z: 2 },
+  { xPct: 24, yPct: 48, wPct: 42, rotate: -2, z: 5 },
+]
+
+// Collage layout inside ABOUT on Mobile
+const aboutFanMobile = [
+  { xPct: 3, yPct: 2, wPct: 44, rotate: -4, z: 2 },
+  { xPct: 48, yPct: 4, wPct: 44, rotate: 3, z: 3 },
+  { xPct: 6, yPct: 32, wPct: 42, rotate: 5, z: 4 },
+  { xPct: 50, yPct: 28, wPct: 42, rotate: -3, z: 2 },
+  { xPct: 24, yPct: 48, wPct: 46, rotate: -2, z: 5 },
 ]
 
 const lerp = (a, b, t) => a + (b - a) * t
@@ -50,13 +65,11 @@ function toPositions(fan, box) {
 export default function PhotoCluster({ wrapperRef, heroSpaceRef, aboutSpaceRef, ready }) {
   const [heroBox, setHeroBox] = useState(null)
   const [aboutBox, setAboutBox] = useState(null)
+  const [isMobile, setIsMobile] = useState(false)
 
-  // Measure the two reserved boxes relative to the wrapper, and re-measure
-  // whenever the layout changes (resize, text reflow, fonts loading in).
-  // This is what keeps the photos locked inside their box instead of
-  // drifting on top of the headline/paragraph text.
   useLayoutEffect(() => {
     function recalc() {
+      setIsMobile(window.innerWidth <= 768)
       setHeroBox(measureBox(wrapperRef.current, heroSpaceRef.current))
       setAboutBox(measureBox(wrapperRef.current, aboutSpaceRef.current))
     }
@@ -74,8 +87,12 @@ export default function PhotoCluster({ wrapperRef, heroSpaceRef, aboutSpaceRef, 
       document.fonts.ready.then(recalc)
     }
 
+    // Secondary recalculation after layout settles
+    const t = setTimeout(recalc, 300)
+
     return () => {
       window.removeEventListener('resize', recalc)
+      clearTimeout(t)
       if (ro) ro.disconnect()
     }
   }, [wrapperRef, heroSpaceRef, aboutSpaceRef])
@@ -85,13 +102,15 @@ export default function PhotoCluster({ wrapperRef, heroSpaceRef, aboutSpaceRef, 
     offset: ['start start', 'end end'],
   })
 
-  // Raw scroll progress mapped to a 0->1 "settle" value (hero -> about),
-  // then run through a spring so the morph glides instead of tracking the
-  // scrollbar 1:1 — this is the main thing that makes it feel "smooth".
-  const settleRaw = useTransform(scrollYProgress, [0, 0.45, 1], [0, 0, 1])
-  const settle = useSpring(settleRaw, { stiffness: 110, damping: 22, mass: 0.6 })
+  // Map scroll progress so the transition completes smoothly as Tentang Kami enters
+  // (between 0.06 and 0.52 progress, so while looking at Tentang Kami, settle is 1.0)
+  const settleRaw = useTransform(scrollYProgress, [0.06, 0.52], [0, 1], { clamp: true })
+  const settle = useSpring(settleRaw, { stiffness: 120, damping: 24, mass: 0.5 })
 
   if (!heroBox || !aboutBox) return null
+
+  const heroFan = isMobile ? heroFanMobile : heroFanDesktop
+  const aboutFan = isMobile ? aboutFanMobile : aboutFanDesktop
 
   const heroPositions = toPositions(heroFan, heroBox)
   const aboutPositions = toPositions(aboutFan, aboutBox)
@@ -126,7 +145,7 @@ export default function PhotoCluster({ wrapperRef, heroSpaceRef, aboutSpaceRef, 
           position: absolute;
           inset: 0;
           pointer-events: none;
-          z-index: 1;
+          z-index: 2;
         }
         .photo-cluster-inner {
           position: relative;
@@ -137,9 +156,10 @@ export default function PhotoCluster({ wrapperRef, heroSpaceRef, aboutSpaceRef, 
           position: absolute;
           border-radius: 20px;
           overflow: hidden;
-          box-shadow: 0 20px 40px -18px rgba(28, 26, 23, 0.35);
-          background: var(--color-surface);
-          will-change: transform;
+          box-shadow: 0 16px 36px -12px rgba(28, 26, 23, 0.32);
+          background: #ffffff;
+          border: 2px solid #1c1a17;
+          will-change: transform, width, top, left;
         }
         .photo-cluster-item img {
           width: 100%;
@@ -148,9 +168,11 @@ export default function PhotoCluster({ wrapperRef, heroSpaceRef, aboutSpaceRef, 
           aspect-ratio: 4 / 5;
           display: block;
         }
-        @media (max-width: 900px) {
-          .photo-cluster {
-            display: none;
+        @media (max-width: 768px) {
+          .photo-cluster-item {
+            border-radius: 14px;
+            border-width: 1.8px;
+            box-shadow: 0 12px 24px -10px rgba(28, 26, 23, 0.28);
           }
         }
       `}</style>
@@ -159,9 +181,6 @@ export default function PhotoCluster({ wrapperRef, heroSpaceRef, aboutSpaceRef, 
 }
 
 function Photo({ photo, hero, about, center, settle, ready, index }) {
-  // Offset from this photo's hero slot back to the shared center point —
-  // used so, before the intro plays, every photo starts stacked together
-  // at the center and then flies out into its fanned hero position.
   const gatherX = center.left - hero.left
   const gatherY = center.top - hero.top
 
@@ -174,18 +193,17 @@ function Photo({ photo, hero, about, center, settle, ready, index }) {
         stiffness: 90,
         damping: 15,
         mass: 0.9,
-        delay: 0.12 + index * 0.09,
+        delay: 0.12 + index * 0.08,
       })
     }
-  }, [ready])
+  }, [ready, index])
 
   const top = useTransform([settle, introProgress], ([s, i]) => lerp(hero.top, about.top, s) + gatherY * (1 - i))
   const left = useTransform([settle, introProgress], ([s, i]) => lerp(hero.left, about.left, s) + gatherX * (1 - i))
+  const width = useTransform(settle, (s) => lerp(hero.width, about.width, s))
   const rotate = useTransform([settle, introProgress], ([s, i]) => lerp(hero.rotate, about.rotate, s) * i)
   const scale = useTransform(introProgress, [0, 1], [0.35, 1])
   const opacity = useTransform(introProgress, [0, 0.4, 1], [0, 1, 1])
-  // Switch stacking order once the photo has mostly landed in the About
-  // collage, so the layering there matches the About layout, not the hero one.
   const zIndex = useTransform(settle, (s) => (s > 0.5 ? about.z : hero.z))
 
   return (
@@ -194,7 +212,7 @@ function Photo({ photo, hero, about, center, settle, ready, index }) {
       style={{
         top,
         left,
-        width: hero.width,
+        width,
         zIndex,
         rotate,
         scale,
