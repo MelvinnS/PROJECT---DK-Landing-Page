@@ -40,7 +40,7 @@ const packages = [
   },
 ]
 
-export default function Packages() {
+export default function Packages({ onNavigateCateringBox }) {
   const scrollRef = useRef(null)
 
   const handleScroll = (direction) => {
@@ -84,12 +84,14 @@ export default function Packages() {
             {packages.map((pkg, i) => (
               <motion.article
                 key={pkg.id}
-                className="oatside-pkg-card"
+                className={`oatside-pkg-card ${pkg.id === 'box' ? 'is-clickable' : ''}`}
                 style={{ backgroundColor: pkg.bg }}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+                onClick={pkg.id === 'box' ? onNavigateCateringBox : undefined}
+                title={pkg.id === 'box' ? 'Klik untuk lihat paket lengkap Catering Box' : undefined}
               >
                 {/* Header text on top-left of card */}
                 <div className="card-top">
@@ -97,6 +99,10 @@ export default function Packages() {
                     <span>{pkg.titleLine1}</span>
                     <span>{pkg.titleLine2}</span>
                   </h3>
+                  {/* "Lihat Paket" pill on catering box card */}
+                  {pkg.id === 'box' && (
+                    <span className="card-cta-pill">Lihat Paket →</span>
+                  )}
                 </div>
 
                 {/* Creative Organic Cutout with Image */}
@@ -134,9 +140,9 @@ export default function Packages() {
 
         {/* Explore More CTA Button */}
         <div className="packages-cta-wrap">
-          <a href="#kontak" className="packages-explore-btn">
-            Explore More →
-          </a>
+          <button className="packages-explore-btn" onClick={onNavigateCateringBox}>
+            Lihat Semua Paket Catering Box →
+          </button>
         </div>
       </div>
 
@@ -269,6 +275,26 @@ export default function Packages() {
         .oatside-pkg-card:hover {
           transform: translateY(-4px);
           box-shadow: 5.5px 7px 0 #1c1a17;
+        }
+
+        .oatside-pkg-card.is-clickable {
+          cursor: pointer;
+        }
+
+        .card-cta-pill {
+          display: inline-block;
+          margin-top: 8px;
+          padding: 4px 13px;
+          border-radius: 9999px;
+          background: rgba(255,255,255,0.25);
+          border: 1.5px solid rgba(255,255,255,0.6);
+          color: #ffffff;
+          font-family: var(--font-body);
+          font-weight: 700;
+          font-size: 12px;
+          letter-spacing: 0.03em;
+          backdrop-filter: blur(4px);
+          box-shadow: 1.5px 2px 0 rgba(255,255,255,0.3);
         }
 
         .card-top {
