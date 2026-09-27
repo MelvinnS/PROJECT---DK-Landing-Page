@@ -17,9 +17,9 @@ export default function Footer() {
 
         <div className="footer-col">
           <h4>Kontak</h4>
-          <p>0812-3456-7890</p>
-          <p>halo@dapoerkuliner.id</p>
-          <p>Kota Batu, Jawa Timur</p>
+          <p>0899-1004-545</p>
+          <p>dapoerkuliner1979@gmail.com</p>
+          <p>Kota Malang, Jawa Timur</p>
         </div>
 
         <div className="footer-col">
