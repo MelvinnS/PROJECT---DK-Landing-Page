@@ -9,6 +9,7 @@ import WhyUs from './components/WhyUs'
 import Packages from './components/Packages'
 import FAQ from './components/FAQ'
 import Footer from './components/Footer'
+import WhatsAppButton from './components/WhatsAppButton'
 
 const SPLASH_DURATION = 1600 // ms shown before landing page appears
 
@@ -53,6 +54,7 @@ export default function App() {
       <Packages />
       <FAQ />
       <Footer />
+      <WhatsAppButton />
 
       <style>{`
         .hero-about-wrap {
