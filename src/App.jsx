@@ -16,6 +16,8 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true)
   const [heroReady, setHeroReady] = useState(false)
   const heroAboutRef = useRef(null)
+  const heroSpaceRef = useRef(null)
+  const aboutSpaceRef = useRef(null)
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), SPLASH_DURATION)
@@ -37,9 +39,14 @@ export default function App() {
       <Navbar />
 
       <div className="hero-about-wrap" ref={heroAboutRef}>
-        <Hero />
-        <About />
-        <PhotoCluster wrapperRef={heroAboutRef} ready={heroReady} />
+        <Hero spaceRef={heroSpaceRef} />
+        <About spaceRef={aboutSpaceRef} />
+        <PhotoCluster
+          wrapperRef={heroAboutRef}
+          heroSpaceRef={heroSpaceRef}
+          aboutSpaceRef={aboutSpaceRef}
+          ready={heroReady}
+        />
       </div>
 
       <WhyUs />

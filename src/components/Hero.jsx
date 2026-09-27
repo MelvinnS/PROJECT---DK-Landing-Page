@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { photos } from '../data/photos'
 
-export default function Hero() {
+export default function Hero({ spaceRef }) {
   return (
     <section id="beranda" className="hero">
       <div className="container hero-inner">
@@ -39,8 +39,10 @@ export default function Hero() {
           </a>
         </motion.div>
 
-        {/* Reserved space for the animated photo cluster (desktop only) */}
-        <div className="hero-photo-space" />
+        {/* Reserved space for the animated photo cluster (desktop only).
+            PhotoCluster measures this box's real position/size so photos
+            always stay locked inside it, no matter the screen width. */}
+        <div className="hero-photo-space" ref={spaceRef} />
 
         {/* Simple static grid fallback for mobile / small screens */}
         <div className="hero-photo-grid">

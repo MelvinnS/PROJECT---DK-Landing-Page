@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { photos } from '../data/photos'
 
-export default function About() {
+export default function About({ spaceRef }) {
   return (
     <section id="tentang" className="about">
       <div className="container about-inner">
@@ -31,7 +31,7 @@ export default function About() {
         </div>
 
         {/* Space reserved for the scroll-linked photo cluster (desktop) */}
-        <div className="about-photo-space" />
+        <div className="about-photo-space" ref={spaceRef} />
 
         {/* Static fallback grid for mobile */}
         <div className="about-photo-grid">
