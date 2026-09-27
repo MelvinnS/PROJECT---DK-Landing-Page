@@ -34,7 +34,7 @@ export default function Hero({ spaceRef }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.32 }}
         >
-          Tanpa bahan aneh, rasa istimewa — murni kelezatan di setiap suapan :)
+          Menerima Cattering Harian dengan menu yang berbeda setiap hari
         </motion.p>
 
         <motion.div

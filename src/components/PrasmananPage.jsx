@@ -214,7 +214,7 @@ export default function PrasmananPage({ onBack }) {
         </div>
 
         {/* Highlight Banner / Info Notes */}
-        <motion.div
+        {/* <motion.div
           className="pras-info-banner"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -236,15 +236,15 @@ export default function PrasmananPage({ onBack }) {
               <p>Rumah, gedung, atau outdoor venue</p>
             </div>
           </div>
-          <div className="info-banner-divider" />
-          <div className="info-banner-item">
+          <div className="info-banner-divider" /> */}
+          {/* <div className="info-banner-item">
             <span className="banner-icon">🎁</span>
             <div>
               <strong>Bonus Menu Gubug:</strong>
               <p>Order 500+ pax free gubug 100 pax</p>
             </div>
-          </div>
-        </motion.div>
+          </div> */}
+        {/* </motion.div> */}
 
         {/* 8 Olahan Grid */}
         <div className="pras-grid">
