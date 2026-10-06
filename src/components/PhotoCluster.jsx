@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState, useCallback } from 'react'
 import { motion, useMotionValue, useTransform, useScroll, useSpring, animate } from 'framer-motion'
 import { photos } from '../data/photos'
 
@@ -44,6 +44,7 @@ function measureBox(wrapperEl, boxEl) {
   if (!wrapperEl || !boxEl) return null
   const wrapperRect = wrapperEl.getBoundingClientRect()
   const boxRect = boxEl.getBoundingClientRect()
+  if (boxRect.width === 0 || boxRect.height === 0 || wrapperRect.width === 0) return null
   return {
     top: boxRect.top - wrapperRect.top,
     left: boxRect.left - wrapperRect.left,
@@ -67,45 +68,60 @@ export default function PhotoCluster({ wrapperRef, heroSpaceRef, aboutSpaceRef, 
   const [aboutBox, setAboutBox] = useState(null)
   const [isMobile, setIsMobile] = useState(false)
 
-  useLayoutEffect(() => {
-    function recalc() {
-      setIsMobile(window.innerWidth <= 768)
-      setHeroBox(measureBox(wrapperRef.current, heroSpaceRef.current))
-      setAboutBox(measureBox(wrapperRef.current, aboutSpaceRef.current))
-    }
+  const recalc = useCallback(() => {
+    if (!wrapperRef.current || !heroSpaceRef.current || !aboutSpaceRef.current) return
+    setIsMobile(window.innerWidth <= 900)
 
+    const hBox = measureBox(wrapperRef.current, heroSpaceRef.current)
+    const aBox = measureBox(wrapperRef.current, aboutSpaceRef.current)
+
+    if (hBox) setHeroBox(hBox)
+    if (aBox) setAboutBox(aBox)
+  }, [wrapperRef, heroSpaceRef, aboutSpaceRef])
+
+  useLayoutEffect(() => {
     recalc()
     window.addEventListener('resize', recalc)
+    window.addEventListener('load', recalc)
 
     let ro
-    if (typeof ResizeObserver !== 'undefined' && wrapperRef.current) {
+    if (typeof ResizeObserver !== 'undefined') {
       ro = new ResizeObserver(recalc)
-      ro.observe(wrapperRef.current)
+      if (wrapperRef.current) ro.observe(wrapperRef.current)
+      if (heroSpaceRef.current) ro.observe(heroSpaceRef.current)
+      if (aboutSpaceRef.current) ro.observe(aboutSpaceRef.current)
     }
 
     if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(recalc)
+      document.fonts.ready.then(() => {
+        recalc()
+        setTimeout(recalc, 100)
+        setTimeout(recalc, 400)
+      })
     }
 
-    // Secondary recalculation after layout settles
-    const t = setTimeout(recalc, 300)
+    const t1 = setTimeout(recalc, 100)
+    const t2 = setTimeout(recalc, 300)
+    const t3 = setTimeout(recalc, 800)
+    const t4 = setTimeout(recalc, 1500)
 
     return () => {
       window.removeEventListener('resize', recalc)
-      clearTimeout(t)
+      window.removeEventListener('load', recalc)
+      clearTimeout(t1)
+      clearTimeout(t2)
+      clearTimeout(t3)
+      clearTimeout(t4)
       if (ro) ro.disconnect()
     }
-  }, [wrapperRef, heroSpaceRef, aboutSpaceRef])
+  }, [recalc, ready])
 
   const { scrollYProgress } = useScroll({
-    target: wrapperRef,
-    offset: ['start start', 'end end'],
+    target: aboutSpaceRef,
+    offset: ['start 85%', 'center 45%'],
   })
 
-  // Map scroll progress so the transition completes smoothly as Tentang Kami enters
-  // (between 0.06 and 0.52 progress, so while looking at Tentang Kami, settle is 1.0)
-  const settleRaw = useTransform(scrollYProgress, [0.06, 0.52], [0, 1], { clamp: true })
-  const settle = useSpring(settleRaw, { stiffness: 120, damping: 24, mass: 0.5 })
+  const settle = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.5 })
 
   if (!heroBox || !aboutBox) return null
 
@@ -168,7 +184,7 @@ export default function PhotoCluster({ wrapperRef, heroSpaceRef, aboutSpaceRef, 
           aspect-ratio: 4 / 5;
           display: block;
         }
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
           .photo-cluster-item {
             border-radius: 14px;
             border-width: 1.8px;
